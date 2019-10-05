@@ -20,6 +20,9 @@ void ofApp::draw(){
 
 	// draw image in canvas at position 0, 0
 	image.draw(0, 0);
+
+	// save image to disk
+	image.save("savedImage.png");
 }
 
 //--------------------------------------------------------------
