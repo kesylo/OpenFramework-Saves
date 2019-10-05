@@ -1,18 +1,25 @@
 #include "ofApp.h"
+// variables
+ofImage image;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-
+	// load image
+	image.loadImage("githubLogo.png");
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+	
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+	// set canvas backgroung RBG
+	ofBackground(255, 255, 255);
 
+	// draw image in canvas at position 0, 0
+	image.draw(0, 0);
 }
 
 //--------------------------------------------------------------
