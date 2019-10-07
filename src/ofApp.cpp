@@ -1,50 +1,55 @@
 #include "ofApp.h"
-#include <cstdlib>
 
 // variables
 ofImage image;
-int w = 512;
-int h = 512;
-
-
+ofImage imageCopy;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	image.loadImage("githubLogo.png");
+	imageCopy.allocate(image.getWidth(), image.getHeight(), OF_IMAGE_COLOR_ALPHA);
+
+	ofPixels & data = image.getPixels();
+
+	// set component value according to image type
+	// OF_IMAGE_COLOR_ALPHA = 4		OF_IMAGE_COLOR = 3		OF_IMAGE_GRAYSCALE = 1
+	int component = 4;
+
+	// modify image
+	for (int y = 0; y < image.getHeight(); y++)			// vertical loop
+	{
+		for (int x = 0; x < image.getWidth(); x++)		// horizontal loop
+		{
+			// read each pixel color
+			int index = component * (x + image.getWidth() * y);		// static
+			// for one pixel int the array, this is his original color composition
+			int red = data[index];
+			int green = data[index + 1];
+			int blue = data[index + 2];
+
+			// you can edit the colors here to have different effect
+			// in this case we will invert the color. that is reduce 255 on every color
+			int newRed = 255 - red;
+			int newGreen = 255 - green;
+			int newBlue = 255 - blue;
+
+			// edit the array
+			data[index] = newRed;
+			data[index + 1] = newGreen;
+			data[index + 2] = newBlue;
+
+			// even as we have alpha we don't touch it
+		}
+	}
+
+	// apply changes to image
+	image.update();
+	
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
 
-	// array of pixels to be filled in our image
-	// An image total pixel count = width * height
-	// we multiply * 4 because we want to use the for channels OF_IMAGE_COLOR_ALPHA
-	unsigned char *data = new unsigned char[w * h * 4];
-
-	// loop through and fill array
-	for (int y = 0; y < h; y++)			// vertical loop
-	{
-		for (int x = 0; x < w; x++)		// horizontal loop
-		{
-			// set any value for each channel 
-			int red = rand() % 256;		// red is in the range 0 to 255;
-			int green = rand() % 256;
-			int blue = rand() % 256;
-			int alpha = 255;
-
-			// add every color to their position in array [r, g, b, a]
-			int index = 4 * (x + w * y);		// Static
-			data[index] = red;
-			data[index + 1] = green;
-			data[index + 2] = blue;
-			data[index + 3] = alpha;
-		}
-	}
-
-	// load array into image
-	image.setFromPixels(data, w, h, OF_IMAGE_COLOR_ALPHA);
-
-	// delete array to free memory
-	delete[] data;
 }
 
 //--------------------------------------------------------------
@@ -54,6 +59,8 @@ void ofApp::draw(){
 	ofSetColor(255, 255, 255);		// display image with color
 
 	image.draw(0, 0);		// draw image in canvas at position 0, 0
+
+	imageCopy.draw(image.getWidth() + 10, 0);		// print next to the edited image
 }
 
 //--------------------------------------------------------------
