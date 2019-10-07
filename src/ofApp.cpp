@@ -18,11 +18,11 @@ void ofApp::draw(){
 	// set canvas backgroung RBG
 	ofBackground(255, 255, 255);
 
+	// draw image with one color chanel
+	ofSetColor(255, 0, 0); // red' = red / 255 = 1 so max value
+
 	// draw image in canvas at position 0, 0
 	image.draw(0, 0);
-
-	// save image to disk
-	image.save("savedImage.png");
 }
 
 //--------------------------------------------------------------
