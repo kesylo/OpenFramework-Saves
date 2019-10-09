@@ -6,55 +6,33 @@ ofImage imageCopy;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	image.loadImage("githubLogo.png");
+	image.load("githubLogo.png");
+	// set imageCopy size and type. this does not copy the image content
+	// it just reserve space in memory
 	imageCopy.allocate(image.getWidth(), image.getHeight(), OF_IMAGE_COLOR_ALPHA);
 
-	ofPixels & data = image.getPixels();
-
-	// set component value according to image type
-	// OF_IMAGE_COLOR_ALPHA = 4		OF_IMAGE_COLOR = 3		OF_IMAGE_GRAYSCALE = 1
-	int component = 4;
-
-	// modify image
-	for (int y = 0; y < image.getHeight(); y++)			// vertical loop
+	for (int y = 0; y < image.getHeight(); y++)
 	{
-		for (int x = 0; x < image.getWidth(); x++)		// horizontal loop
+		for (int x = 0; x < image.getWidth(); x++)
 		{
-			// read each pixel color
-			int index = component * (x + image.getWidth() * y);		// static
-			// for one pixel int the array, this is his original color composition
-			int red = data[index];
-			int green = data[index + 1];
-			int blue = data[index + 2];
-
-			// you can edit the colors here to have different effect
-			// in this case we will invert the color. that is reduce 255 on every color
-			int newRed = 255 - red;
-			int newGreen = 255 - green;
-			int newBlue = 255 - blue;
-
-			// edit the array
-			data[index] = newRed;
-			data[index + 1] = newGreen;
-			data[index + 2] = newBlue;
-
-			// even as we have alpha we don't touch it
+			// get color RGBA of each pixel a position xy
+			ofColor imageColor = image.getColor(x, y);
+			// set it on the new image
+			imageCopy.setColor(x, y, imageColor);
 		}
 	}
-
-	// apply changes to image
-	image.update();
-	
+	// update edited image
+	imageCopy.update();
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+	
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	ofSetBackgroundColor(255, 255, 255);
+	ofSetBackgroundColor(255, 255, 255);		// set windows BG white
 
 	ofSetColor(255, 255, 255);		// display image with color
 
