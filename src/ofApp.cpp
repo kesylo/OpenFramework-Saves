@@ -6,25 +6,32 @@ ofImage imageCopy;
 
 //--------------------------------------------------------------
 void ofApp::setup() {
+	int h, s, b;
 
 	image.load("Rainbow.jpg");
 	// set imageCopy size and type. this does not copy the image content
 	// it just reserve space in memory
-	imageCopy.allocate(image.getWidth(), image.getHeight(), OF_IMAGE_COLOR_ALPHA);
+	imageCopy.allocate(image.getWidth(), image.getHeight(), OF_IMAGE_COLOR);
 
 	for (int y = 0; y < image.getHeight(); y++)
 	{
 		for (int x = 0; x < image.getWidth(); x++)
 		{
-			// get color RGBA of each pixel a position xy
-			ofColor imageColor = image.getColor(x, y);
+			// get color RGB of each pixel a position xy
+			ofColor rgbColor = image.getColor(x, y);
 
-			// turn rgb pixel to grayScale
-			// eg: pixel: [122, 23, 67] becomes [70.6, 70.6, 70.6]
-			int grayScale = (imageColor.r + imageColor.g + imageColor.b) / 3;
+			// get hsb color vaues from rgb color
+			h = rgbColor.getHueAngle();		// in degree
+			s = (rgbColor.getSaturation() / 255) * 100;		// in percent %
+			b = (rgbColor.getBrightness() / 255) * 100;		// in percent %
 
-			// create grayscaled color
-			ofColor newColor(grayScale, grayScale, grayScale);
+			//// For checking  
+			//cout << "Hue: " << h << endl;
+			//cout << "Saturation: " << s << endl;
+			//cout << "Brightness: " << b << endl;
+
+			// create hsb color
+			ofColor newColor(h, s, b);
 
 			// set it on the new image
 			imageCopy.setColor(x, y, newColor);
