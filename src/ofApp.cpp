@@ -8,6 +8,8 @@ ofImage imageCopy;
 void ofApp::setup() {
 	int h, s, b;
 
+	int treshold = 200;
+
 	image.load("SinCity.jpg");
 	// set imageCopy size and type. this does not copy the image content
 	// it just reserve space in memory
@@ -20,28 +22,24 @@ void ofApp::setup() {
 			// get color RGB of each pixel a position xy
 			ofColor rgbColor = image.getColor(x, y);
 
-			// get hsb color vaues from rgb color
-			h = rgbColor.getHueAngle();		// in degree
-			s = (rgbColor.getSaturation() / 255) * 100;		// in percent %
-			b = (rgbColor.getBrightness() / 255) * 100;		// in percent %
+			// Convert to grayscale
+			int grayScale = (rgbColor.r + rgbColor.g + rgbColor.b) / 3;
 
-			if ((0 >= h && h <= 30) || (0 <= h && h >= 330))
+			// if less than treshold apply white
+			if (grayScale < treshold)
 			{
-				imageCopy.setColor(x, y, rgbColor);
-
-				//if (0 <= h && h <= 20) {
-				//	//printf("%d -> ", h);
-				//	imageCopy.setColor(x, y, rgbColor);
-				//}
+				// apply white
+				ofColor blackColor(0, 0, 0);
+				// set it on the new image
+				imageCopy.setColor(x, y, blackColor);
 			}
 			else
 			{
-				int grayScale = (rgbColor.r + rgbColor.g + rgbColor.b) / 3;
-
-				ofColor newColor(grayScale, grayScale, grayScale);
-
+				// apply black
+				ofColor whiteColor(255, 255, 255);
 				// set it on the new image
-				imageCopy.setColor(x, y, newColor);
+				imageCopy.setColor(x, y, whiteColor);
+
 			}
 		}
 	}
