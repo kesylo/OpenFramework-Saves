@@ -8,7 +8,7 @@ ofImage imageCopy;
 void ofApp::setup() {
 	int h, s, b;
 
-	image.load("Rainbow.jpg");
+	image.load("SinCity.jpg");
 	// set imageCopy size and type. this does not copy the image content
 	// it just reserve space in memory
 	imageCopy.allocate(image.getWidth(), image.getHeight(), OF_IMAGE_COLOR);
@@ -25,16 +25,24 @@ void ofApp::setup() {
 			s = (rgbColor.getSaturation() / 255) * 100;		// in percent %
 			b = (rgbColor.getBrightness() / 255) * 100;		// in percent %
 
-			//// For checking  
-			//cout << "Hue: " << h << endl;
-			//cout << "Saturation: " << s << endl;
-			//cout << "Brightness: " << b << endl;
+			if ((0 >= h && h <= 30) || (0 <= h && h >= 330))
+			{
+				imageCopy.setColor(x, y, rgbColor);
 
-			// create hsb color
-			ofColor newColor(h, s, b);
+				//if (0 <= h && h <= 20) {
+				//	//printf("%d -> ", h);
+				//	imageCopy.setColor(x, y, rgbColor);
+				//}
+			}
+			else
+			{
+				int grayScale = (rgbColor.r + rgbColor.g + rgbColor.b) / 3;
 
-			// set it on the new image
-			imageCopy.setColor(x, y, newColor);
+				ofColor newColor(grayScale, grayScale, grayScale);
+
+				// set it on the new image
+				imageCopy.setColor(x, y, newColor);
+			}
 		}
 	}
 	// update edited image
