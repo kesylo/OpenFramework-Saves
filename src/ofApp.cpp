@@ -1,76 +1,97 @@
 #include "ofApp.h"
 
-// variables
 ofImage image;
-ofImage imageCopy;
+ofImage grayImage;
+int grayAddedValue = 0;
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	int h, s, b;
-
-	int treshold = 200;
-
-	image.load("SinCity.jpg");
-	// set imageCopy size and type. this does not copy the image content
-	// it just reserve space in memory
-	imageCopy.allocate(image.getWidth(), image.getHeight(), OF_IMAGE_COLOR);
-
-	for (int y = 0; y < image.getHeight(); y++)
-	{
-		for (int x = 0; x < image.getWidth(); x++)
-		{
-			// get color RGB of each pixel a position xy
-			ofColor rgbColor = image.getColor(x, y);
-
-			// Convert to grayscale
-			int grayScale = (rgbColor.r + rgbColor.g + rgbColor.b) / 3;
-
-			// if less than treshold apply white
-			if (grayScale < treshold)
-			{
-				// apply white
-				ofColor blackColor(0, 0, 0);
-				// set it on the new image
-				imageCopy.setColor(x, y, blackColor);
-			}
-			else
-			{
-				// apply black
-				ofColor whiteColor(255, 255, 255);
-				// set it on the new image
-				imageCopy.setColor(x, y, whiteColor);
-
-			}
-		}
-	}
-	// update edited image
-	imageCopy.update();
+	// create gui and add elements to it
+	gui.setup();
+	gui.add(intSlider.setup("Grayscale Slider", 0, 0, 255));
+	
+	// load original image
+	image.load("hue.jpg");
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
+	
 
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-	ofSetBackgroundColor(255, 255, 255);		// set windows BG white
-
-	ofSetColor(255, 255, 255);		// display image with color
-
-	image.draw(0, 0);		// draw image in canvas at position 0, 0
-
-	imageCopy.draw(image.getWidth() + 10, 0);		// print next to the edited image
+	ofSetBackgroundColor(255);
+	ofSetColor(255);
+	image.draw(0, 0);
+	grayImage.draw(image.getWidth() + 10, 0);
+	
+	// draw gui 
+	gui.draw();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-
+	if (key == '1')
+	{
+		// Display gray version of Image
+		image.load("hue.jpg");
+		grayImage = getGrayScaledImageOf(image);
+		draw();
+	}
+	if (key == OF_KEY_UP)
+	{
+		/*grayAddedValue += 10;
+		grayImage = getGrayScaledImageOf(image);
+		draw();*/
+	}
 }
+
+
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key) {
 
+}
+
+ofImage ofApp::getGrayScaledImageOf(ofImage originalImage) {
+	int w = originalImage.getWidth();
+	int h = originalImage.getHeight();
+	ofImage imgCopy;
+	ofColor grayColor;
+	int grayLevel;
+	int i;
+
+	// get all pixels in array
+	ofPixels_<unsigned char> listPixels = originalImage.getPixels();
+	// create array for all pixels color
+	ofColor* pixelColors = new ofColor[w * h];
+
+	for (int y = 0; y < h; y++)
+	{
+		for (int x = 0; x < w; x++)
+		{
+			// for loop in colors
+			i = y * w + x;
+
+			// get color of each pixel a position xy
+			pixelColors[i] = listPixels.getColor(x, y);
+
+			// easy get grey level
+			grayLevel = pixelColors[i].getLightness();
+
+			// create grey color
+			grayColor = (grayLevel, grayLevel, grayLevel);
+
+			// set it on pixel list
+			listPixels.setColor(x, y, grayColor);
+		}
+	}
+	// create image copy from edited pixel array 
+	imgCopy.setFromPixels(listPixels);
+
+	return imgCopy;
 }
 
 //--------------------------------------------------------------
