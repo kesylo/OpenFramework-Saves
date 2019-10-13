@@ -1,6 +1,8 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxGui.h"
+#include "ofxGrafica.h"
 
 class ofApp : public ofBaseApp{
 
@@ -20,5 +22,19 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+
+		// my Methods
+		ofImage getGrayScaledImageOf(ofImage image);
+
+		void showHistogramOf(ofImage grayImage);
+
+		int countValueOccurences(int num, int* arr, int length);
+
+		void drawPlotOnScreen(vector<ofxGPoint> points, string plotName, string xAxisName, string yAxisName, int plotHeight);
+
+		// Gui
+		ofxPanel gui;
+		ofxIntSlider intSlider;
+		ofxGPlot plot;
 		
 };
