@@ -26,6 +26,10 @@ class ofApp : public ofBaseApp{
 		// my Methods
 		ofImage getGrayScaledImageOf(ofImage image);
 
+		ofImage LUTBlackAndWhite(ofImage imageIn);
+
+		ofImage LUTVShape(ofImage imageIn);
+
 		void showHistogramOf(ofImage grayImage);
 
 		int countValueOccurences(int num, int* arr, int length);

@@ -3,7 +3,11 @@
 
 ofImage mainImage;
 ofImage grayImage;
+ofImage lutImage;
 int grayAddedValue = 0;
+bool drawMainImage = false; 
+bool drawGrayImage = false;
+bool drawLUT = false;
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -12,7 +16,14 @@ void ofApp::setup() {
 	gui.add(intSlider.setup("Grayscale Slider", 0, 0, 255));
 	
 	// load original image
-	mainImage.load("hue.jpg");
+	mainImage.load("SinCity.jpg");
+
+	grayAddedValue = 3;
+
+	if (grayAddedValue > 1 && grayAddedValue < 5)
+	{
+		cout << "yess";
+	}
 
 	//------------------------------------------------------------------------
 
@@ -36,12 +47,27 @@ void ofApp::update() {
 void ofApp::draw() {
 	ofSetBackgroundColor(255);
 	ofSetColor(255);
-	mainImage.draw(0, 0);
-	grayImage.draw(mainImage.getWidth() + 10, 0);
+
+	if (drawMainImage)
+	{
+		mainImage.draw(0, 0);
+	}
+
+	if (drawGrayImage)
+	{
+		grayImage.draw(mainImage.getWidth() + 10, 0);
+	}
+
+	if (drawLUT)
+	{
+		lutImage.draw(mainImage.getWidth() + 10, 0);
+	}
+	
+	
 
 	
 	// display plot
-	plot.setDim(500, 300);
+	/*plot.setDim(500, 300);
 	plot.setPos(mainImage.getWidth(), 0);
 	plot.beginDraw();
 	plot.drawBackground();
@@ -51,7 +77,7 @@ void ofApp::draw() {
 	plot.drawTitle();
 	plot.drawHistograms();
 	plot.endDraw();
-	
+	*/
 	
 	// draw gui 
 	gui.draw();
@@ -59,12 +85,16 @@ void ofApp::draw() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
+	if (key == '7')
+	{
+		drawMainImage = true;
+		draw();
+	}
 	if (key == '1')
 	{
 		// Display gray version of Image
 		mainImage.load("hue.jpg");
 		grayImage = getGrayScaledImageOf(mainImage);
-		update();
 		draw();
 	}
 	if (key == OF_KEY_UP)
@@ -79,6 +109,20 @@ void ofApp::keyPressed(int key) {
 		mainImage.load("SinCity.jpg");		// load image
 		grayImage = getGrayScaledImageOf(mainImage);		// convert to gray
 		showHistogramOf(grayImage);		// display histogram
+	}
+	if (key == 'b')
+	{
+		// draw LUT Black and White
+		lutImage = LUTBlackAndWhite(mainImage);
+		drawLUT = true;
+		draw();
+	}
+	if (key == 'v')
+	{
+		// draw LUT Black and White
+		lutImage = LUTVShape(mainImage);
+		drawLUT = true;
+		draw();
 	}
 }
 
@@ -133,6 +177,68 @@ ofImage ofApp::getGrayScaledImageOf(ofImage image) {
 	imgCopy.setFromPixels(listPixels);
 
 	return imgCopy;
+}
+
+ofImage ofApp::LUTBlackAndWhite(ofImage imageIn)
+{
+	int grayLevel;
+	ofColor black = ofColor::black;
+	ofColor white = ofColor::white;
+	ofImage imageOut;
+	imageOut.allocate(imageIn.getWidth(), imageIn.getHeight(), OF_IMAGE_COLOR);
+
+	for (int y = 0; y < imageIn.getHeight(); y++)
+	{
+		for (int x = 0; x < imageIn.getWidth(); x++)
+		{
+			grayLevel = imageIn.getColor(x, y).getLightness();
+
+			if (grayLevel <= 127)
+			{
+				imageOut.setColor(x, y, black);
+			}
+			else
+			{
+				imageOut.setColor(x, y, white);
+			}
+		}
+	}
+	imageOut.update();
+
+	return imageOut;
+}
+
+ofImage ofApp::LUTVShape(ofImage imageIn)
+{
+	int grayLevel;
+	int start = 0;
+	int middleLeft = 65;
+	int middleRight = 126;
+	int end = 255;
+	ofImage imageOut;
+	ofColor black = ofColor::black;
+	ofColor white = ofColor::white;
+	imageOut.allocate(imageIn.getWidth(), imageIn.getHeight(), OF_IMAGE_COLOR);
+
+	for (int y = 0; y < imageIn.getHeight(); y++)
+	{
+		for (int x = 0; x < imageIn.getWidth(); x++)
+		{
+			grayLevel = imageIn.getColor(x, y).getLightness();
+
+			if (grayLevel >= start && grayLevel <= middleLeft || grayLevel >= middleRight && grayLevel <= end)
+			{
+				imageOut.setColor(x, y, white);
+			}
+			else if (grayLevel >= middleLeft && grayLevel <= middleRight)
+			{
+				imageOut.setColor(x, y, black);
+			}
+		}
+	}
+	imageOut.update();
+
+	return imageOut;
 }
 
 void ofApp::drawPlotOnScreen(vector<ofxGPoint> points, string plotName, string xAxisName, string yAxisName, int plotHeight) {
