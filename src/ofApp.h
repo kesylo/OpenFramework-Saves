@@ -14,6 +14,9 @@ class ofApp : public ofBaseApp{
 		void keyPressed(int key) override;
 
 		// my Methods
+
+		static ofImage subtract_images(const ofImage& img_in1, const ofImage& img_in2);
+
 		static ofImage get_gray_scaled_image_of(ofImage image);
 
 		static ofImage lut_black_and_white(const ofImage& image_in, int threshold);
@@ -28,7 +31,8 @@ class ofApp : public ofBaseApp{
 
 		static std::vector<int> get_histogram_array(const ofImage& gray_image);
 
-		void draw_plot_on_screen(const vector<ofxGPoint>& points, string plot_name, string x_axis_name, string y_axis_name, const int plot_height);
+		void draw_plot_on_screen(const vector<ofxGPoint>& points, const string& plot_name, const string& x_axis_name,
+		                         const string& y_axis_name, const int plot_height);
 
 		// Gui
 		ofxPanel gui;

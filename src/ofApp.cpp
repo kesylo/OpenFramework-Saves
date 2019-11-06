@@ -4,18 +4,43 @@
 #include <numeric>
 #include <algorithm>
 
+// pour l'exam tu peux faire le plus, fois, divisé entre 2 images
+
 #pragma region variables
 ofImage main_image;
-ofImage main_image_clone;
-ofImage gray_image;
-ofImage lut_image;
-ofImage a_binarisation_image;
-int gray_added_value = 0;
 bool draw_main_image = false;
+
+ofImage seven_diff_img_1;
+ofImage seven_diff_img_2;
+ofImage seven_diff_img_out;
+bool draw_seven_diff_img = false;
+
+ofImage main_image_clone;
 bool draw_main_image_clone = false;
+
+ofImage gray_image;
 bool draw_gray_image = false;
+
+ofImage lut_image;
 bool draw_lut = false;
+
+ofImage a_binarisation_image;
 bool draw_a_bin_image = false;
+
+// other variables
+int gray_added_value = 0;
+
+
+
+
+
+
+
+
+
+
+
+
 #pragma endregion
 
 
@@ -26,7 +51,11 @@ void ofApp::setup() {
 	gui.add(int_slider.setup("Grayscale Slider", 0, 0, 255));
 	
 	// load original image
-	main_image.load("coins2.jpg");
+	main_image.load("coins.jpg");
+
+	// load images for subtract
+	seven_diff_img_1.load("1.jpg");
+	seven_diff_img_2.load("2.jpg");
 
 	
 }
@@ -62,21 +91,24 @@ void ofApp::draw() {
 	{
 		a_binarisation_image.draw(main_image.getWidth() + 10, 0);
 	}
-
+	if (draw_seven_diff_img)
+	{
+		seven_diff_img_1.draw(0,0);
+		seven_diff_img_2.draw(0,seven_diff_img_2.getHeight() + 2);
+		seven_diff_img_out.draw(main_image.getWidth() + 10, 0);
+	}
 	
-	
-	
-	// display plot
-	plot.setDim(300, 300);
-	plot.setPos(0, 300);
-	plot.beginDraw();
-	plot.drawBackground();
-	plot.drawBox();
-	plot.drawYAxis();
-	plot.drawXAxis();
-	plot.drawTitle();
-	plot.drawHistograms();
-	plot.endDraw();
+	//// display plot
+	//plot.setDim(300, 300);
+	//plot.setPos(0, 300);
+	//plot.beginDraw();
+	//plot.drawBackground();
+	//plot.drawBox();
+	//plot.drawYAxis();
+	//plot.drawXAxis();
+	//plot.drawTitle();
+	//plot.drawHistograms();
+	//plot.endDraw();
 	
 	// draw gui 
 	gui.draw();
@@ -132,9 +164,71 @@ void ofApp::keyPressed(int key) {
 		draw_a_bin_image = true;
 		draw();
 	}
+	if (key == '-')
+	{
+		// subtract 2 images
+		draw_seven_diff_img = true;
+		seven_diff_img_out = subtract_images(seven_diff_img_1, seven_diff_img_2);
+		draw();
+	}
 }
 
+
+
 /*-----------------------------------------------------------------------------------------------------*/
+
+ofImage ofApp::subtract_images(const ofImage& img_in1, const ofImage& img_in2)
+{
+	// variables
+	const auto img1_Height = img_in1.getHeight();
+	const auto img2_Height = img_in2.getHeight();
+	const auto img1_Width = img_in1.getWidth();
+	const auto img2_Width = img_in2.getWidth();
+	ofImage img_out;
+	const auto& list_pixels1 = img_in1.getPixels();
+	const auto& list_pixels2 = img_in2.getPixels();
+	auto list_pixels_out = list_pixels1;
+	const auto pixelColors1 = new ofColor[img1_Height * img1_Width];
+	const auto pixelColors2 = new ofColor[img2_Height * img2_Width];
+
+	// check if the 2 images have the same size
+	if (img1_Height == img2_Height && img1_Width == img2_Width)
+	{
+		// loop through both images
+		for (auto y = 0; y < img1_Height; y++)
+		{
+			for (auto x = 0; x < img1_Width; x++)
+			{
+				const int i = y * img1_Width + x;
+
+				// get each pixel from each image
+				pixelColors1[i] = list_pixels1.getColor(x, y);
+				pixelColors2[i] = list_pixels2.getColor(x, y);
+
+				// subtract
+				float color = (pixelColors1[i].getLightness()) - (pixelColors2[i].getLightness());
+				if (color < 0)
+				{
+					color = color * (-1);
+					ofColor gray_color(color);
+					list_pixels_out.setColor(x, y, gray_color);
+				}
+				else if (color == 0 || color > 0)
+				{
+					ofColor gray_color(color);
+					list_pixels_out.setColor(x, y, gray_color);
+				}
+			}
+		}
+		img_out.setFromPixels(list_pixels_out);
+	}
+	else
+	{
+		cout << "Not same size";
+	}
+
+	return img_out;
+}
 
 std::vector<int> ofApp::get_histogram_array(const ofImage& gray_image)
 {
@@ -315,7 +409,8 @@ ofImage ofApp::adaptive_binarisation(const ofImage& image_in)
 	return out_image;
 }
 
-void ofApp::draw_plot_on_screen(const vector<ofxGPoint>& points, string plot_name,  string x_axis_name,  string y_axis_name, const int plot_height)
+void ofApp::draw_plot_on_screen(const vector<ofxGPoint>& points, const string& plot_name, const string& x_axis_name,
+                                const string& y_axis_name, const int plot_height)
 {
 	// Add the points
 	plot.setPoints(points);
@@ -363,5 +458,7 @@ void ofApp::show_histogram_of(ofImage gray_image) {
 
 	draw_plot_on_screen(points, "GrayScale Histogram", "x", "y", 40000);
 }
+
+
 
 /*-----------------------------------------------------------------------------------------------------*/
