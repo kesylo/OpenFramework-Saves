@@ -27,6 +27,9 @@ bool draw_lut = false;
 ofImage a_binarisation_image;
 bool draw_a_bin_image = false;
 
+int table[16]; // table for color replacing
+
+
 // other variables
 int gray_added_value = 0;
 
@@ -43,7 +46,6 @@ int gray_added_value = 0;
 
 #pragma endregion
 
-
 //--------------------------------------------------------------
 void ofApp::setup() {
 	// create gui and add elements to it
@@ -57,19 +59,69 @@ void ofApp::setup() {
 	seven_diff_img_1.load("1.jpg");
 	seven_diff_img_2.load("2.jpg");
 
+	// load video
+	video.load("videoFile.mp4");
+	video.play();
+
+	//Fill the table by random values from 0 to 255
+	for (auto i=0; i<16; i++ ) {
+		table[i] = ofRandom( 0, 255 );
+	}
+
 	
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
 	
+	video.update();
 
+	//Do computing only if a new frame was obtained
+	if ( video.isFrameNew() ) {
+		//Getting pixels
+		auto pixels = video.getPixels();
+		//Scan all the pixels
+		for (auto y=0; y<pixels.getHeight(); y++) {
+			for (auto x=0; x<pixels.getWidth(); x++) {
+				//Getting pixel (x,y) color
+				auto col = pixels.getColor( x, y );
+				//Change color components of col
+				//using table
+				col.r = table[ col.r/16 ];
+				col.g = table[ col.g/16 ];
+				col.b = table[ col.b/16 ];
+				//Set the color back to the pixel (x,y)
+				pixels.setColor( x, y, col );
+			}
+		}
+		//Set pixel array to the image
+		imgVideo.setFromPixels( pixels );
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
 	ofSetBackgroundColor(255);
 	ofSetColor(255);
+
+	imgVideo.draw(0,0);
+
+	//auto& pixels = video.getPixels();
+
+	////Define variables w, h equal to frame width and height
+	//int w = pixels.getWidth();
+	//int h = pixels.getHeight();
+
+	////Scan center horizontal line
+	//for (int x=0; x<w; x++) {
+	////Getting color of the center line
+	//ofColor color = pixels.getColor( x, h / 2 );
+	////Draw a vertical line using this color
+	//ofSetColor( color );
+	//ofLine( x, 0, x, h );
+	//}
+
+
 
 	if (draw_main_image)
 	{
@@ -97,6 +149,8 @@ void ofApp::draw() {
 		seven_diff_img_2.draw(0,seven_diff_img_2.getHeight() + 2);
 		seven_diff_img_out.draw(main_image.getWidth() + 10, 0);
 	}
+
+	//video.draw(10, 10);
 	
 	//// display plot
 	//plot.setDim(300, 300);
@@ -172,8 +226,6 @@ void ofApp::keyPressed(int key) {
 		draw();
 	}
 }
-
-
 
 /*-----------------------------------------------------------------------------------------------------*/
 

@@ -39,6 +39,10 @@ class ofApp : public ofBaseApp{
 		ofxIntSlider int_slider;
 		ofxGPlot plot;
 
+		// video
+		ofVideoPlayer video;
+		ofImage imgVideo;
+
 		// keep code
 		/*
 		// find max element in array
